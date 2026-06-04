@@ -1,8 +1,6 @@
 ![license](https://img.shields.io/badge/license-Apache%202-red?style=flat)
 [![data](https://img.shields.io/badge/data-Zenodo-blue?style=flat)](https://zenodo.org/records/20544289)
 
-Code and data associated with the paper **Ouvia: A User-centered Framework for Measuring Usability of Speech Translation in Real-World Communication Scenarios**.
-
 ## Project Structure
 
 Upcoming.
