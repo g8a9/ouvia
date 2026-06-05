@@ -1,5 +1,6 @@
 ![license](https://img.shields.io/badge/license-Apache%202-red?style=flat)
 [![data](https://img.shields.io/badge/data-Zenodo-blue?style=flat)](https://zenodo.org/records/20544289)
+[!![arXiv](https://img.shields.io/badge/arXiv--red?style=flat)](https://arxiv.org/abs/2606.06177)
 
 ## Project Structure
 
