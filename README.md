@@ -10,7 +10,7 @@
 > [!NOTE]
 > We will soon release a basic documentation in the GitHub wiki as a tutorial walkthrough for running a new study.
 
-> [!IMPORTANT]
+> [!WARNING]
 > This is a research project. All results reported in our paper and new studies can be reproduced with the code released here, but this is **not a production-ready platform**. Support is provided on a best-effort basis — if anything is unclear, please [open an issue](https://github.com/g8a9/ouvia/issues) and we'll do our best to help.
 
 ## Data Release
