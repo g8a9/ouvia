@@ -1,0 +1,7 @@
+Scenario: 
+One person enters a pharmacy and asks the counter staff for advice and medication. 
+
+Instructions:
+The person has to greet the pharmacist, explain their symptoms and recent medication history, and ask for advice and a new prescription. 
+You can imagine the person can suffering from one of these generic illnesses: cold and flu symptoms, headaches and migraines, digestive issues, allergies, skin conditions, muscle and join pain, minor infections, sleep problems, eye and ear issues, menstrual and reproductive health.
+Be sure to provide detailed descriptions of the symptoms, as well as the exact names and quantities of the medication.

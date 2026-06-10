@@ -1,0 +1,12 @@
+Scenario:
+A tourist visiting Portugal.
+
+Instructions:
+The tourist is interacting with a local in an everyday mundane situation. Here are some example situations.
+- Taxi: The client greets the driver politely and states their destination clearly. If they plan to make any additional stops, they mention those as well. They then ask the driver for an estimated fare before the ride begins.
+- Restaurant: The tourist asks about specific menu items, including ingredients and preparation methods. They inquire about portion sizes, spice levels, and whether dishes can be modified for dietary restrictions. They can communicate eventual allergies. They also ask for wine or beverage recommendations that pair well with their meal choice.
+- Hotel reception: The guest reports a specific room issue (broken air conditioning, noisy neighbors, non-functioning WiFi) and requests immediate assistance. They mention their room number, check-out date, and ask about alternative accommodations if the problem cannot be resolved quickly.
+- Grocery store: The tourist asks an employee for help locating specific ingredients for a recipe, including brand preferences and quantity needed. They inquire about store-brand alternatives, freshness dates, and whether certain items are seasonal or permanently stocked.
+- Public transportation: The traveler approaches a station agent asking for detailed directions to a specific address, including which lines to take, transfer points, and approximate travel time. They also ask about ticket types, pricing for multiple zones, and service frequency during off-peak hours.
+- Tourist information center: The visitor requests specific information about local attractions, including opening hours, admission fees, and available guided tours. They ask about transportation options to reach these locations and whether advance booking is required for certain activities.
+- Bank: The tourist needs to exchange currency and asks about current exchange rates, fees, and required documentation. They inquire about daily withdrawal limits, ATM locations, and whether their international card will work at local machines.

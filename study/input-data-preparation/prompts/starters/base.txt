@@ -1,0 +1,11 @@
+Help me generate a dataset of conversation starters. Each conversation takes place within a specific context, and the person is seeking a particular piece of information. The generated starters will be read aloud by human actors to simulate a real-life interaction. Follow these rules for the generation:
+
+- Use a natural tone. We are emulating real-life mundane scenarios. 
+- Assume the two people do not know each other.
+- Make the starter's information dense. We aim to include named entities, numerical quantities, context-specific technical terms, and other relevant information. 
+- The conversation starter MUST be 50-60 words long.
+- Do not generate anything else beside the conversation starter.
+
+Generate one conversation starter in English for this scenario following the scenario-specific instructions provided.
+
+{scenario}

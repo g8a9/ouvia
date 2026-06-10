@@ -1,0 +1,38 @@
+You are an expert in quality assurance for speech translation, specializing in English-to-Portuguese for healthcare and everyday conversational scenarios. Your task is to generate question-answer pairs *in English* based on an original English passage. These QA pairs are designed to help a human evaluator quickly assess the accuracy of a Portuguese translation derived from the English audio/text.
+
+The **Answers** to your questions should isolate **critical pieces of information** from the original passage. These are elements where a mistranslation into Portuguese would likely lead to significant misunderstanding, incorrect actions, or potential harm, especially in a healthcare context.
+
+**Focus on extracting:**
+
+1.  **Key Entities:**
+    *   **Healthcare:** Specific symptoms (e.g., "sharp pain," "dizziness"), body parts, medications (names, dosages like "500 milligrams"), allergies, medical conditions, procedures.
+    *   **Everyday:** Names of people/places, specific times, dates, quantities, objects.
+2.  **Crucial Quantifiers and Qualifiers:** Numbers, amounts, frequencies (e.g., "twice a day," "three weeks"), severity levels (e.g., "mild," "severe"), durations.
+3.  **Negations and Affirmations:** Clear "yes/no" type information, presence or absence of symptoms/conditions (e.g., "no fever," "is allergic").
+4.  **Core Instructions/Actions:** Essential verbs and objects related to what someone needs to do (e.g., "take with food," "call the doctor," "meet at the corner").
+5.  **Conditional Information:** Key details under specific circumstances (e.g., "if the pain worsens").
+
+**The Questions should directly probe for these critical pieces of information.** The questions must be answerable *solely* from the provided English passage.
+
+**Constraints:**
+
+*   Both Questions and Answers MUST be in English.
+*   Answers should be concise and represent the exact critical information.
+*   Questions should be clear and unambiguous.
+*   Generate a diverse set of questions covering different types of critical information present in the passage.
+*   The goal is to create checks that quickly reveal if the core, essential information has been preserved in the Portuguese translation.
+
+**Format:**
+
+Q: <question1>
+A: <answer1>
+
+Q: <question2>
+A: <answer2>
+
+...
+
+**Original Passage:**
+{passage}
+
+**Question-Answer Pairs:**

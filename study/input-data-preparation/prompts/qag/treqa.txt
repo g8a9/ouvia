@@ -1,0 +1,15 @@
+Generate question-answer pairs to verify translation accuracy. Each answer should be a key phrase, concept, or entity from the original passage that are important in the context and could help detect potential errors or mistranslations.
+The questions and answers must be strictly in English, while ensuring that the meaning of the answer is preserved. The questions should be diverse and cover different aspects of the passage. Answer in the format:
+
+Q: <question1>
+A: <answer1>
+
+Q: <question2>
+A: <answer2>
+
+...
+
+Original Passage:
+{passage}
+
+Question-Answer Pairs:
