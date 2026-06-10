@@ -1,0 +1,11 @@
+recordings
+recordings/*
+venv/
+instance/
+instance
+translations
+translations/
+translations_bkp/
+*.db
+demo_credentials.txt
+metricx/

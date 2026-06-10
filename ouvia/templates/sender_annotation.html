@@ -1,0 +1,442 @@
+{% extends "base.html" %}
+{% block title %}Read Conversation · Study Portal{% endblock %}
+{% block content %}
+{% if is_admin_preview %}
+<div class="row justify-content-center mb-3">
+  <div class="col-xl-9">
+    <div class="alert alert-warning mb-0" role="alert">
+      <strong>Admin Preview Mode</strong> — This is a demonstration with mock data. Recording functionality is disabled.
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="row justify-content-center mb-4">
+  <div class="col-xl-9">
+    <a class="btn btn-link px-0" href="{{ url_for('admin_ui_preview_index') if is_admin_preview else url_for('participant_home') }}">&larr; {{ 'Back to UI previews' if is_admin_preview else 'Back to assignments' }}</a>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-xl-9">
+    {% if progress %}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small text-muted text-uppercase">Progress</span>
+          <span class="fw-semibold">{{ progress.percent }}%</span>
+        </div>
+        <div class="progress" style="height: 0.75rem;">
+          <div class="progress-bar" role="progressbar" style="width: {{ progress.percent }}%;" aria-valuenow="{{ progress.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="small text-muted mt-2">{{ progress.completed }} of {{ progress.total }} tasks completed</div>
+      </div>
+    </div>
+    {% endif %}
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
+          <div>
+            <h1 class="h3 fw-semibold mb-1">Conversation {{ conversation.external_id }}</h1>
+            <p class="text-muted mb-0">Topic: {{ conversation.topic or '—' }}</p>
+          </div>
+          <span class="badge rounded-pill bg-primary-subtle text-primary">Sender assignment</span>
+        </div>
+        <div>
+          <h2 class="h5 fw-semibold">Passage to read</h2>
+          <div class="border rounded-4 p-4 bg-light" style="white-space: pre-wrap; line-height: 1.6; max-height: 24rem; overflow-y: auto;">
+            {{ conversation.source_text or 'No source text available.' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-lg-5">
+        <div id="recording-config" data-save-url="{{ url_for('save_sender_recording', entry_id=entry.id) }}" data-next-url="{{ url_for('sender_annotation', entry_id=next_entry.id) if next_entry else url_for('participant_home') }}" data-has-existing="{{ 'true' if recording else 'false' }}" hidden></div>
+        <div id="status" class="mb-3">{{ 'A recording is already saved. Recording is locked until the study team requests changes.' if recording else 'Ready to record.' }}</div>
+        <div class="d-flex flex-wrap gap-3 mb-3">
+          <button type="button" class="btn btn-primary" id="recordButton">
+            <span class="me-2">●</span> Record
+          </button>
+          <button type="button" class="btn btn-outline-primary" id="stopButton" disabled>Stop</button>
+          <button type="button" class="btn btn-outline-secondary" id="deleteButton" disabled>Re-record</button>
+          <button type="button" class="btn btn-success" id="saveButton" disabled>Save recording</button>
+        </div>
+        <div id="countdownContainer" class="mb-3" style="display: none;">
+          <div class="d-flex align-items-center gap-3">
+            <div id="countdownNumber" class="display-1 fw-bold text-primary" style="min-width: 80px; text-align: center;"></div>
+            <div class="text-muted">Get ready to speak...</div>
+          </div>
+        </div>
+        <div id="waveformContainer" class="mb-3" style="display: none;">
+          <canvas id="waveformCanvas" width="600" height="80" style="width: 100%; height: 80px; border-radius: 0.5rem; background: #f8f9fa;"></canvas>
+        </div>
+        <div id="playback-controls" class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-3" style="display: none;">
+          <audio id="audioPlayback" controls class="w-100" style="display: none;"></audio>
+        </div>
+        <div id="safariAudioWarning" class="alert bg-danger-subtle text-danger-emphasis border border-danger-subtle py-2 mt-2 mb-0 small" style="display: none;">
+          If you can't listen to the audio and are using Safari, please try another browser like Firefox or Chrome.
+        </div>
+        <div id="saveReminder" class="alert bg-danger-subtle text-danger border border-danger-subtle mt-3" style="display: none;">
+          Saving a recording submits it to the study team. Once saved, you cannot edit or replace this audio.
+        </div>
+        <hr class="my-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            {% if next_entry %}
+            <p class="text-muted mb-0">Next assignment: Conversation {{ next_entry.conversation.external_id }}</p>
+            {% else %}
+            <p class="text-muted mb-0">This is your last assignment for now.</p>
+            {% endif %}
+          </div>
+          <button type="button" class="btn btn-primary" id="nextEntryButton" disabled>{{ 'Go to next assignment' if next_entry else 'Back to assignments' }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const recordButton = document.getElementById('recordButton');
+    const stopButton = document.getElementById('stopButton');
+    const audioPlayback = document.getElementById('audioPlayback');
+    const playbackControls = document.getElementById('playback-controls');
+    const deleteButton = document.getElementById('deleteButton');
+    const saveButton = document.getElementById('saveButton');
+    const statusDiv = document.getElementById('status');
+    const nextButton = document.getElementById('nextEntryButton');
+    const saveReminder = document.getElementById('saveReminder');
+    const safariAudioWarning = document.getElementById('safariAudioWarning');
+    const config = document.getElementById('recording-config');
+    const countdownContainer = document.getElementById('countdownContainer');
+    const countdownNumber = document.getElementById('countdownNumber');
+    const waveformContainer = document.getElementById('waveformContainer');
+    const waveformCanvas = document.getElementById('waveformCanvas');
+    const canvasCtx = waveformCanvas.getContext('2d');
+
+    const saveUrl = config.dataset.saveUrl;
+    const nextUrl = config.dataset.nextUrl;
+    let hasSavedRecording = config.dataset.hasExisting === 'true';
+
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioBlob = null;
+    let recordingLocked = hasSavedRecording;
+    let audioContext = null;
+    let analyser = null;
+    let animationId = null;
+    let mediaStream = null;
+
+    const setStatus = (message, cssClass = '') => {
+      statusDiv.textContent = message;
+      statusDiv.className = cssClass ? `${cssClass} mb-3` : 'mb-3';
+    };
+
+    const drawWaveform = () => {
+      if (!analyser) return;
+      
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+
+      // Resize canvas to match display size
+      const rect = waveformCanvas.getBoundingClientRect();
+      waveformCanvas.width = rect.width * window.devicePixelRatio;
+      waveformCanvas.height = rect.height * window.devicePixelRatio;
+      canvasCtx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+      const width = rect.width;
+      const height = rect.height;
+
+      canvasCtx.fillStyle = '#f8f9fa';
+      canvasCtx.fillRect(0, 0, width, height);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = '#0d6efd';
+      canvasCtx.beginPath();
+
+      const sliceWidth = width / bufferLength;
+      let x = 0;
+
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = (v * height) / 2;
+
+        if (i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+        x += sliceWidth;
+      }
+
+      canvasCtx.lineTo(width, height / 2);
+      canvasCtx.stroke();
+
+      animationId = requestAnimationFrame(drawWaveform);
+    };
+
+    const stopWaveform = () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+      if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+      }
+      waveformContainer.style.display = 'none';
+    };
+
+    const startCountdown = () => {
+      return new Promise((resolve) => {
+        countdownContainer.style.display = 'block';
+        let count = 3;
+        countdownNumber.textContent = count;
+        setStatus('Get ready...', 'alert alert-info');
+
+        const interval = setInterval(() => {
+          count--;
+          if (count > 0) {
+            countdownNumber.textContent = count;
+          } else {
+            clearInterval(interval);
+            countdownContainer.style.display = 'none';
+            resolve();
+          }
+        }, 1000);
+      });
+    };
+
+    const setButtonsForCountdown = () => {
+      recordButton.disabled = true;
+      stopButton.disabled = true;
+      deleteButton.disabled = true;
+      saveButton.disabled = true;
+      nextButton.disabled = true;
+      playbackControls.style.display = 'none';
+      audioPlayback.style.display = 'none';
+      if (safariAudioWarning) {
+        safariAudioWarning.style.display = 'none';
+      }
+      if (saveReminder) {
+        saveReminder.style.display = 'none';
+      }
+    };
+
+    const setButtonsForRecording = () => {
+      recordButton.disabled = true;
+      stopButton.disabled = false;
+      deleteButton.disabled = true;
+      saveButton.disabled = true;
+      nextButton.disabled = true;
+      playbackControls.style.display = 'none';
+      audioPlayback.style.display = 'none';
+      if (safariAudioWarning) {
+        safariAudioWarning.style.display = 'none';
+      }
+      if (saveReminder) {
+        saveReminder.style.display = 'none';
+      }
+    };
+
+    const setButtonsForPlayback = () => {
+      recordButton.disabled = true;
+      stopButton.disabled = true;
+      deleteButton.disabled = false;
+      saveButton.disabled = false;
+      nextButton.disabled = true;
+      if (saveReminder) {
+        saveReminder.style.display = 'block';
+      }
+    };
+
+    const lockRecordingControls = () => {
+      recordingLocked = true;
+      recordButton.disabled = true;
+      stopButton.disabled = true;
+      deleteButton.disabled = true;
+      saveButton.disabled = true;
+      nextButton.disabled = false;
+      if (saveReminder) {
+        saveReminder.style.display = 'none';
+      }
+    };
+
+    const resetButtons = (hasRecording = false) => {
+      if (recordingLocked) {
+        lockRecordingControls();
+        return;
+      }
+      recordButton.disabled = false;
+      stopButton.disabled = true;
+      deleteButton.disabled = !hasRecording;
+      saveButton.disabled = true;
+      nextButton.disabled = !hasRecording;
+    };
+
+    const initializeExistingRecording = () => {
+      if (!hasSavedRecording) {
+        resetButtons(false);
+        setStatus('Ready to record.');
+        playbackControls.style.display = 'none';
+        audioPlayback.style.display = 'none';
+        if (safariAudioWarning) {
+          safariAudioWarning.style.display = 'none';
+        }
+        if (saveReminder) {
+          saveReminder.style.display = 'none';
+        }
+        return;
+      }
+
+      lockRecordingControls();
+      playbackControls.style.display = 'none';
+      audioPlayback.style.display = 'none';
+      if (safariAudioWarning) {
+        safariAudioWarning.style.display = 'none';
+      }
+      setStatus('A recording is already saved. Recording is locked until the study team requests changes.', 'alert alert-info');
+    };
+
+    recordButton.addEventListener('click', async () => {
+      if (recordingLocked) {
+        return;
+      }
+
+      try {
+        // Get microphone access first (before countdown)
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStream = stream;
+
+        // Show countdown
+        setButtonsForCountdown();
+        await startCountdown();
+
+        // Set up audio context and analyser for waveform
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        // Show waveform and start drawing
+        waveformContainer.style.display = 'block';
+        drawWaveform();
+
+        // Start recording
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+        hasSavedRecording = false;
+
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach((track) => track.stop());
+          stopWaveform();
+          audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          audioPlayback.src = audioUrl;
+          audioPlayback.style.display = 'block';
+          playbackControls.style.display = 'flex';
+          if (safariAudioWarning) {
+            safariAudioWarning.style.display = 'block';
+          }
+          audioChunks = [];
+          setButtonsForPlayback();
+          setStatus('Recording stopped. You can now listen, re-record, or save.', 'alert alert-warning');
+        };
+
+        mediaRecorder.start();
+        setButtonsForRecording();
+        setStatus('Recording... Speak clearly into your microphone.', 'alert alert-info');
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        countdownContainer.style.display = 'none';
+        stopWaveform();
+        setStatus('Error: Could not access microphone. Please grant permission.', 'alert alert-danger');
+        resetButtons(false);
+      }
+    });
+
+    stopButton.addEventListener('click', () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        stopWaveform();
+      }
+    });
+
+    deleteButton.addEventListener('click', () => {
+      if (recordingLocked) {
+        return;
+      }
+
+      audioBlob = null;
+      hasSavedRecording = false;
+      audioPlayback.src = '';
+      playbackControls.style.display = 'none';
+      audioPlayback.style.display = 'none';
+      if (safariAudioWarning) {
+        safariAudioWarning.style.display = 'none';
+      }
+      setStatus('Ready to record.');
+      resetButtons(false);
+      if (saveReminder) {
+        saveReminder.style.display = 'none';
+      }
+    });
+
+    saveButton.addEventListener('click', async () => {
+      if (recordingLocked) {
+        return;
+      }
+
+      if (!audioBlob) {
+        setStatus('Please record audio before saving.', 'alert alert-warning');
+        return;
+      }
+
+      setStatus('Saving recording. Please wait...', 'alert alert-info');
+      saveButton.disabled = true;
+      deleteButton.disabled = true;
+
+      const formData = new FormData();
+      formData.append('audio_data', audioBlob, 'recording.wav');
+
+      try {
+        const response = await fetch(saveUrl, {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Unable to save recording.');
+        }
+
+        audioBlob = null;
+        hasSavedRecording = true;
+        lockRecordingControls();
+        setStatus('Recording saved successfully. You can proceed to the next assignment.', 'alert alert-success');
+      } catch (error) {
+        console.error('Error saving recording:', error);
+        setStatus(`Error: ${error.message}`, 'alert alert-danger');
+        saveButton.disabled = false;
+        deleteButton.disabled = false;
+      }
+    });
+
+    nextButton.addEventListener('click', () => {
+      if (!nextButton.disabled) {
+        window.location.href = nextUrl;
+      }
+    });
+
+    initializeExistingRecording();
+  });
+</script>
+{% endblock %}

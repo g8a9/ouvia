@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Login · Study Portal{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-lg-5">
+        <h1 class="h3 mb-4 text-center">Welcome Back</h1>
+        {% if error %}
+        <div class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+        {% endif %}
+        <form method="post" novalidate>
+          <div class="mb-3">
+            <label for="unique_id" class="form-label">Unique ID</label>
+            <input class="form-control form-control-lg" type="text" id="unique_id" name="unique_id" placeholder="Enter your study ID" required autofocus>
+            <div class="form-text">Use the unique ID provided for this study.</div>
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input class="form-control form-control-lg" type="password" id="password" name="password" placeholder="Admins enter their password">
+            <div class="form-text">Only admins need a password. Other roles can leave this blank.</div>
+          </div>
+          <div class="d-grid">
+            <button class="btn btn-primary btn-lg" type="submit">Sign In</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,236 @@
+<div class="d-flex justify-content-center mb-4">
+  <div id="lang-toggle" class="btn-group" role="group" aria-label="Language selection">
+    <button type="button" class="btn btn-outline-primary active" data-lang="en">English</button>
+    <button type="button" class="btn btn-outline-primary" data-lang="pt">Português</button>
+  </div>
+</div>
+
+<div data-lang-content="en" class="active">
+<h1 class="h3 fw-semibold mb-4 text-center">Study Terms &amp; Conditions: Informed Consent Form</h1>
+{% if terms_required %}
+<p class="text-center">To participate in this study, please review the terms below and confirm your consent. You must accept these terms before continuing.</p>
+{% else %}
+<p class="text-center">Review the terms below and confirm your consent if you choose. Acceptance is optional unless the study team enables enforcement.</p>
+{% endif %}
+<div class="border rounded-4 p-4 bg-light mb-4 terms-scroll">
+  <h2 class="h5 fw-semibold mb-3">Title of the Study</h2>
+  <p >Ouvia: A User-Centered Benchmark for Usability Assessment of Speech Translation Systems</p>
+
+  <h3 class="h6 fw-semibold mt-4">Principal Investigator</h3>
+  <p class="small">André F. T. Martins<br>
+    Instituto Superior Técnico, Universidade de Lisboa<br>
+    <a href="mailto:andre.t.martins@tecnico.ulisboa.pt">andre.t.martins@tecnico.ulisboa.pt</a></p>
+
+  <h3 class="h6 fw-semibold mt-4">Purpose of the Study</h3>
+  <p class="small">You are invited to participate in a scientific research study that aims to evaluate the effectiveness, usability, and fairness of modern speech translation (ST) systems in real-life communication scenarios.</p>
+  <p class="small">Through Ouvia, you can provide your voice, questionnaire responses, or other resources that will contribute to building an open-source database that will help researchers understand the capabilities and limitations of current speech translation tools.</p>
+
+  <h3 class="h6 fw-semibold mt-4">Eligibility</h3>
+  <p class="small">By participating in this study, you declare that all the requirements below are met:</p>
+  <ul class="small ps-4">
+    <li>You are at least 18 years old.</li>
+    {% if user_role == 'sender' %}
+    <li>You are proficient (C1 level or above) in English.</li>
+    {% elif user_role == 'receiver' %}
+    <li>You are proficient (C1 level or above) in Portuguese (any variant).</li>
+    {% elif user_role == 'validator' %}
+    <li>You are proficient (C1 level or above) in English (any variant) and Portuguese (any variant).</li>
+    {% endif %}
+    <li>You agree with the terms outlined in the remainder of this document.</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">General Conditions</h3>
+  <p class="small">Your participation is entirely voluntary.</p>
+  <p class="small">You may refuse to participate or withdraw your participation at any time, without giving any reason and without any penalty or loss of benefits to which you are otherwise entitled.</p>
+  <p class="small">You also have the right to request the deletion of your data at any time. Upon completing a session, you will receive monetary compensation for your participation, in accordance with the payment terms set by the crowdworking platform (Prolific) through which you were recruited. More specifically:</p>
+  <ul class="small ps-4">
+    <li>Your compensation would be at the rate as indicated in the recruitement platform (Prolific).</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Your Contribution</h3>
+  {% if user_role == 'sender' or user_role == 'final_sender' %}
+  <p class="small">
+    This is a longitudinal study <strong>composed of two phases</strong> to be completed across two or three weeks (mostly, depending on additional participants that take on different parts of the study).
+
+    Please find below a detailed description of the contribution for each session. Detailed instructions will also be provided in your dashboard.
+    <ul class="small ps-4">
+      <li>In the first phase, participants are tasked with reading out loud ten sentences. We will record and collect the recordings.</li>
+      <li>In the second phase, participants are asked to complete a short questionnaire for which we will record your responses.</li>
+    </ul>
+
+    {%if user_role == 'sender' %}
+      <p class="small">
+        You are expected to complete both phases, which will take approximately 20 minutes each. However, we understand that unforeseen circumstances may arise, and we are committed to accommodating your needs. If you are unable to complete both phases, we will still compensate you for the work you have completed.
+      </p>
+    {% else %}
+      <p class="small">
+        <strong>Your task is to complete the second phase of the study, which is a survey</strong>. This survey will ask you to provide feedback on the usability and perceived reliability of several AI translations.
+        Since you have not participated to the first part of the study (i.e., the voice recording phase), we will provide you with recordings from other participants to complete the survey. Moreover, all the sections of these terms and conditions related to the voice recording phase do not apply to you, since you will not be providing any voice data.
+      </p>
+    {% endif %}
+
+    <p class="small">
+      Moreover, we will collect and store your age range, gender identity, sex, and broad ethnical group.
+    </p>
+  </p>
+  {% elif user_role == 'receiver' %}
+  <p class="small">You will need to read short texts in Portuguese and respond to a short questionnaire. We will record your responses.</p>
+  <ul class="small ps-4">
+    <li>You will need to read short texts in Portuguese and respond to a short questionnaire. We will record your responses.</li>
+  </ul>
+  <p class="small">Please, refer to the study description on the recruitment platform to know the estimated completion time.</p>
+  {% elif user_role == 'validator' %}
+  <ul class="small ps-4">
+    <li>You will be asked to assess the quality of the translation from the an original English audio to the Portuguese text.</li>
+    <li>You will provide a quality rating on a given scale.</li>
+    <li>You will answer questions based on the English audio.</li>
+    <li>You will verify answers to questions based on the Portuguese translation.</li>
+    <li>We will record all your responses.</li>
+  </ul>
+  <p class="small">Please, refer to the study description on the recruitment platform to know the estimated completion time.</p>
+  {% endif %}
+  <p class="small">—</p>
+  <p class="small">All of the data mentioned above (demographic information, recorded voice, and survey responses), will be released to the public under the Creative Commons CC BY 4.0 license (<a href="https://creativecommons.org/licenses/by/4.0/deed.en" target="_blank" rel="noopener noreferrer">https://creativecommons.org/licenses/by/4.0/deed.en</a>).</p>
+
+  <h3 class="h6 fw-semibold mt-4">Platform</h3>
+  <p class="small">All tasks will be performed asynchronously through <b>this</b> platform developed by the researchers leading this study. The platform is protected with standard secure communication protocols. Access to the platform is granted through a private password shared by the researchers to the participants.</p>
+
+  <h3 class="h6 fw-semibold mt-4">Data Protection</h3>
+  <p class="small">We will implement the following steps to protect the data you will provide:</p>
+  <ul class="small ps-4">
+    <li>We will anonymize your data by not releasing any information that can directly identify you. For example, we will assign you a new unique user identifier. We will release the survey responses, the voice segments, demographic attributes, and survey responses mapped to this new user id. This means that nobody, including us (the researchers), will have access to your identity.</li>
+    <li>Once compiled and publicized, we will gate the access to the dataset. To access the dataset, the following statement will need to be accepted: “The dataset consists of people who have provided their voice online. You agree not to attempt to determine the identity of speakers in this dataset or to clone individual voices.”</li>
+    <li>We will store your data for no more than ten years.</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Benefits and Risks</h3>
+  <h4 class="fw-semibold small mt-3">Direct and Indirect Benefits</h4>
+  <p class="small">Besides monetary compensation, your voice and responses will help future research on AI-enabled language and translation technologies. Our goal is to guide research that makes such tools fairer and more usable by the broadest range of demographic groups. Therefore, you may indirectly benefit from the outcome of our study.</p>
+  <h4 class="fw-semibold small mt-3">Concerning the Risk of Personal Identification</h4>
+  <p class="small">While voice recordings and demographic metadata (i.e., age range, gender, ethnicity) will be made publicly available for research purposes, no other information will be disclosed. This choice aligns with the principles of data minimization (e.g., requesting age ranges versus exact numbers, broad ethnic groups versus fine-grained ethnicity, etc.) and anonymization while maintaining utility for fairness research in AI systems.</p>
+  <h4 class="fw-semibold small mt-3">Addressing the Risk of Voice Cloning</h4>
+  <p class="small">There is a chance that future users will leverage the voice released in Ouvia to train automatic tools for disparate goals. One such use can be cloning participants’ voices. However, our study design minimizes this risk by:</p>
+  <ul class="small ps-4">
+    <li>Collecting only ten recordings from you. Moreover, these segments are short (30 seconds or less) and will be recorded in a neutral tone, which makes faithful and expressive voice cloning more challenging to achieve.</li>
+    <li>Gating the access to the dataset and providing access to only those users who explicitly agree not to use it to clone individual voices (see more details in Data Protection).</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Consent Statement</h3>
+  <p class="small">By proceeding to the next page, you confirm that:</p>
+  <ul class="small ps-4">
+    <li>You have read and understood the information provided above.</li>
+    <li>You understand that your participation is voluntary, and that you may withdraw at any time.</li>
+    <li>You consent to the collection and processing of sensitive data, including my voice recording and demographic attributes.</li>
+    <li>You consent to the public release of anonymized data under a CC BY 4.0 license for up to ten years.</li>
+  </ul>
+</div>
+</div>
+
+<div data-lang-content="pt">
+<h1 class="h3 fw-semibold mb-4 text-center">Termos e Condições do Estudo: Formulário de Consentimento Informado</h1>
+{% if terms_required %}
+<p class="text-center">Para participar neste estudo, por favor, reveja os termos abaixo e confirme o seu consentimento. Tem de aceitar estes termos antes de continuar.</p>
+{% else %}
+<p class="text-center">Reveja os termos abaixo e confirme o seu consentimento se assim o desejar. A aceitação é opcional, exceto se a equipa do estudo ativar a aplicação obrigatória.</p>
+{% endif %}
+<div class="border rounded-4 p-4 bg-light mb-4 terms-scroll">
+  <h2 class="h5 fw-semibold mb-3">Título do Estudo</h2>
+  <p >Ouvia: Uma Referência Centrada no Utilizador para a Avaliação da Usabilidade de Sistemas de Tradução de Fala</p>
+
+  <h3 class="h6 fw-semibold mt-4">Investigador Principal</h3>
+  <p class="small">André F.T. Martins<br>
+    Instituto Superior Técnico, Universidade de Lisboa<br>
+    <a href="mailto:andre.t.martins@tecnico.ulisboa.pt">andre.t.martins@tecnico.ulisboa.pt</a></p>
+
+  <h3 class="h6 fw-semibold mt-4">Objetivo do Estudo</h3>
+  <p class="small">Gostaríamos de convidá-lo(a) a participar num estudo de investigação científica que visa avaliar a eficácia, a usabilidade e a equidade dos sistemas modernos de tradução de fala (ST) em cenários de comunicação da vida real.</p>
+  <p class="small">Através do Ouvia, poderá contribuir com dados de voz, respostas a questionários ou outros recursos que contribuirão para a construção de uma base de dados aberta que ajudará os investigadores a compreender as capacidades e limitações das atuais ferramentas de tradução de fala.</p>
+
+  <h3 class="h6 fw-semibold mt-4">Elegibilidade</h3>
+  <p class="small">Ao participar neste estudo, deverá declarar que todos os requisitos abaixo são cumpridos:</p>
+  <ul class="small ps-4">
+    <li>Tem pelo menos 18 anos de idade.</li>
+    {% if user_role == 'sender' %}
+    <li>É proficiente (nível C1 ou superior) em inglês.</li>
+    {% elif user_role == 'receiver' %}
+    <li>É proficiente (nível C1 ou superior) em português (qualquer variante).</li>
+    {% elif user_role == 'validator' %}
+    <li>É proficiente (nível C1 ou superior) em inglês (qualquer variante) e português (qualquer variante).</li>
+    {% endif %}
+    <li>Concorda com os termos descritos no restante deste documento.</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Condições Gerais</h3>
+  <p class="small">A sua participação é totalmente voluntária.</p>
+  <p class="small">Pode recusar-se a participar ou retirar a sua participação a qualquer momento, sem apresentar qualquer motivo e sem qualquer penalização ou perda de benefícios a que teria direito de outra forma.</p>
+  <p class="small">Também tem o direito de solicitar a eliminação dos seus dados em qualquer momento.</p>
+  <p class="small">Após a conclusão de uma sessão, receberá uma compensação monetária pela sua participação, de acordo com os termos de pagamento estabelecidos pela plataforma de crowdworking (Prolific) através da qual foi recrutado(a). Mais especificamente:</p>
+  <ul class="small ps-4">
+    <li>A sua compensação será à taxa de €14/hora.</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">A sua Contribuição</h3>
+  <p class="small">As suas tarefas serão organizadas em sessões de trabalho. Encontre abaixo a contribuição que irá fornecer para uma determinada sessão. Instruções detalhadas também serão fornecidas no seu painel de controlo.</p>
+  {% if user_role == 'sender' %}
+  <p class="small">Recolheremos e armazenaremos o seu intervalo de idade, identidade de género e grupo étnico geral.</p>
+  <p class="small">Na primeira fase, ser-lhe-á pedido que leia dez frases em voz alta. Iremos gravar e recolher as gravações.</p>
+  <p class="small">Na segunda fase, ser-lhe-á pedido que preencha um breve questionário, para o qual gravaremos as suas respostas.</p>
+  <ul class="small ps-4">
+    <li>Recolheremos e armazenaremos o seu intervalo de idade, identidade de género e grupo étnico geral.</li>
+    <li>Na primeira fase, ser-lhe-á pedido que leia dez frases em voz alta. Iremos gravar e recolher as gravações.</li>
+    <li>Na segunda fase, ser-lhe-á pedido que preencha um breve questionário, para o qual gravaremos as suas respostas.</li>
+  </ul>
+  <p class="small">Espera-se que conclua ambas as fases, o que levará aproximadamente 10 minutos.</p>
+  {% elif user_role == 'receiver' %}
+  <p class="small">Terá de ler textos curtos em português e responder a um breve questionário. Iremos gravar as suas respostas.</p>
+  <ul class="small ps-4">
+    <li>Terá de ler textos curtos em português e responder a um breve questionário. Iremos gravar as suas respostas.</li>
+  </ul>
+  <p class="small">Espera-se que conclua uma sessão, que levará aproximadamente 35 minutos.</p>
+  {% elif user_role == 'validator' %}
+  <ul class="small ps-4">
+    <li>Ser-lhe-á pedido que avalie a qualidade da tradução de um áudio original em inglês para o texto em português.</li>
+    <li>Irá fornecer uma classificação de qualidade numa escala específica.</li>
+    <li>Irá responder a perguntas com base no áudio em inglês.</li>
+    <li>Irá verificar as respostas às perguntas com base na tradução em português.</li>
+    <li>Iremos gravar todas as suas respostas.</li>
+  </ul>
+  <p class="small">Espera-se que conclua uma sessão, que levará aproximadamente 2 horas e 30 minutos.</p>
+  {% endif %}
+  <p class="small">—</p>
+  <p class="small">Todos os dados mencionados acima (informação demográfica, voz gravada e respostas ao inquérito), serão divulgados ao público sob a licença Creative Commons CC BY 4.0 (<a href="https://creativecommons.org/licenses/by/4.0/deed.pt" target="_blank" rel="noopener noreferrer">https://creativecommons.org/licenses/by/4.0/deed.pt</a>).</p>
+
+  <h3 class="h6 fw-semibold mt-4">Plataforma</h3>
+  <p class="small">Todas as tarefas serão realizadas de forma assíncrona através <b>desta</b> plataforma desenvolvida pelos investigadores que lideram este estudo. A plataforma está protegida com protocolos de comunicação seguros padrão. O acesso à plataforma é concedido através de uma palavra-passe privada partilhada pelos investigadores com os participantes.</p>
+
+  <h3 class="h6 fw-semibold mt-4">Proteção de Dados</h3>
+  <p class="small">A seguintes medidas de protecção de dados serão implementadas:</p>
+  <ul class="small ps-4">
+    <li>Os seus dados serão anonimizados, não sendo divulgada qualquer informação que o(a) possa identificar diretamente. Por exemplo, atribuir-lhe-emos um novo identificador de utilizador único. Divulgaremos as respostas ao inquérito, os segmentos de voz, os atributos demográficos e as respostas ao inquérito mapeados para este novo ID de utilizador. Isto significa que ninguém, incluindo nós (os investigadores), terá acesso à sua identidade.</li>
+    <li>Uma vez compilado e publicado, o acesso ao conjunto de dados será condicionado. Para aceder ao conjunto de dados, será necessário aceitar a seguinte declaração: “O conjunto de dados é composto por pessoas que forneceram a sua voz online. Concordo em não tentar determinar a identidade dos falantes neste conjunto de dados ou clonar vozes individuais.”</li>
+    <li>Armazenaremos os seus dados por um período não superior a dez anos.</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Benefícios e Riscos</h3>
+  <h4 class="fw-semibold small mt-3">Benefícios Diretos e Indiretos</h4>
+  <p class="small">Além da compensação monetária, a sua voz e as suas respostas ajudarão a investigação futura em tecnologias de língua e tradução baseadas em IA. O nosso objetivo é orientar a investigação para que estas ferramentas se tornem mais justas e utilizáveis pelo maior leque possível de grupos demográficos.</p>
+  <p class="small">Dessa forma, poderá beneficiar indiretamente dos resultados do nosso estudo.</p>
+  <h4 class="fw-semibold small mt-3">Relativamente ao Risco de Identificação Pessoal</h4>
+  <p class="small">Embora as gravações de voz e os metadados demográficos (ou seja, intervalo de idade, género, etnia) sejam disponibilizados publicamente para fins de investigação, nenhuma outra informação será divulgada. Esta escolha está alinhada com os princípios da minimização de dados (por exemplo, solicitar intervalos de idade em vez de números exatos, grupos étnicos gerais em vez de etnias detalhadas, etc.) e da anonimização, mantendo ao mesmo tempo a utilidade para a investigação sobre a equidade em sistemas de IA.</p>
+  <h4 class="fw-semibold small mt-3">Abordagem ao Risco de Clonagem de Voz</h4>
+  <p class="small">Existe a possibilidade de futuros utilizadores aproveitarem a voz divulgada no Ouvia para treinar ferramentas automáticas para fins díspares. Um desses usos pode ser a clonagem das vozes dos participantes. No entanto, o desenho do nosso estudo minimiza este risco ao:</p>
+  <ul class="small ps-4">
+    <li>Recolher apenas dez gravações suas. Além disso, estes segmentos são curtos (30 segundos ou menos) e serão gravados num tom neutro, o que torna a clonagem de voz fiel e expressiva mais difícil de alcançar.</li>
+    <li>Condicionar o acesso ao conjunto de dados e fornecê-lo apenas aos utilizadores que concordem explicitamente em não o utilizar para clonar vozes individuais (ver mais detalhes em Proteção de Dados).</li>
+  </ul>
+
+  <h3 class="h6 fw-semibold mt-4">Declaração de Consentimento</h3>
+  <p class="small">Ao prosseguir para a página seguinte, confirma que:</p>
+  <ul class="small ps-4">
+    <li>Leu e compreendeu a informação fornecida acima.</li>
+    <li>Compreende que a sua participação é voluntária e que pode retirar-se a qualquer momento.</li>
+    <li>Consente na recolha e tratamento de dados sensíveis, incluindo a sua gravação de voz e atributos demográficos.</li>
+    <li>Consente na divulgação pública de dados anonimizados sob uma licença CC BY 4.0 por um período de até dez anos.</li>
+  </ul>
+</div>
+</div>

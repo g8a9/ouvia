@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% set page_title = receiver_locale.text('annotation.page_title', 'Answer Questions · Study Portal') if receiver_locale else 'Answer Questions · Study Portal' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block head_styles %}
+{{ super() }}
+<style>
+  .receiver-translation-wrapper {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .receiver-translation-card {
+    position: sticky;
+    top: 1rem;
+    z-index: 20;
+    background-color: var(--bs-body-bg, #ffffff);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.75rem 2rem rgba(15, 23, 42, 0.12);
+    border: 1px solid rgba(13, 110, 253, 0.2);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+
+  .receiver-translation-card .translation-body {
+    white-space: pre-wrap;
+    line-height: 1.55;
+  }
+
+  .receiver-question-card .card-body {
+    padding: 2rem;
+  }
+
+  .receiver-question-card .receiver-question {
+    margin-bottom: 2.5rem;
+  }
+
+  .receiver-question-card textarea {
+    min-height: 5.5rem;
+  }
+
+  @media (max-width: 992px) {
+    .receiver-translation-card {
+      top: 0.75rem;
+      max-height: none;
+    }
+
+    .receiver-translation-wrapper {
+      height: auto;
+    }
+
+    .receiver-question-card .card-body {
+      padding: 1.5rem;
+    }
+
+    .receiver-question-card .receiver-question {
+      margin-bottom: 2rem;
+    }
+  }
+</style>
+{% endblock %}
+{% block content %}
+{% if is_admin_preview %}
+<div class="row justify-content-center mb-3">
+  <div class="col-xl-9">
+    <div class="alert alert-warning mb-0" role="alert">
+      <strong>Admin Preview Mode</strong> — This is a demonstration with mock data. Form submission is disabled.
+    </div>
+  </div>
+</div>
+{% endif %}
+<div class="row justify-content-center mb-4">
+  <div class="col-xl-9">
+    <a class="btn btn-link px-0" href="{{ url_for('admin_ui_preview_index') if is_admin_preview else url_for('participant_home') }}">&larr; {{ 'Back to UI previews' if is_admin_preview else (receiver_locale.text('annotation.back', 'Back to assignments') if receiver_locale else 'Back to assignments') }}</a>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-xl-9">
+  <div class="row g-4 g-xl-5 align-items-lg-stretch">
+      <div class="col-lg-5 order-lg-2">
+        <div class="receiver-translation-wrapper">
+          <div class="receiver-translation-card p-4">
+            <div class="d-flex flex-column gap-3">
+              <div class="d-flex justify-content-between align-items-start">
+              <div>
+                {% set topic_text = conversation.topic or '—' %}
+                {% if receiver_locale %}
+                  {% set conversation_heading = receiver_locale.text('annotation.conversation_title', 'Conversation {id}', id=conversation.external_id) %}
+                  {% set topic_heading = receiver_locale.text('annotation.topic', 'Topic: {topic}', topic=topic_text) %}
+                {% else %}
+                  {% set conversation_heading = 'Conversation ' ~ conversation.external_id %}
+                  {% set topic_heading = 'Topic: ' ~ topic_text %}
+                {% endif %}
+                <h1 class="h5 fw-semibold mb-1">{{ conversation_heading }}</h1>
+                <p class="text-muted mb-0 small">{{ topic_heading }}</p>
+              </div>
+              <span class="badge rounded-pill bg-success-subtle text-success">{{ receiver_locale.text('annotation.badge', 'Receiver assignment') if receiver_locale else 'Receiver assignment' }}</span>
+            </div>
+              <div>
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <h2 class="h6 fw-semibold mb-0">{{ receiver_locale.text('annotation.translation.heading', 'Translated conversation') if receiver_locale else 'Translated conversation' }}</h2>
+                  {% if translation_payload and translation_payload.metadata %}
+                  <span class="badge bg-primary-subtle text-primary">{{ receiver_locale.text('annotation.translation.badge', 'Auto-generated') if receiver_locale else 'Auto-generated' }}</span>
+                  {% endif %}
+                </div>
+                {% set translated_fallback = receiver_locale.text('annotation.translation.missing', 'No translated conversation available yet.') if receiver_locale else 'No translated conversation available yet.' %}
+                {% set translated_display = translation_text|default(translated_fallback, true) %}
+                <div class="translation-body">{{ translated_display|trim|e }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7 order-lg-1">
+        <div class="card border-0 shadow-sm receiver-question-card">
+          <div class="card-body">
+            {% if progress %}
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small text-muted text-uppercase">{{ receiver_locale.text('home.progress.label', 'Progress') if receiver_locale else 'Progress' }}</span>
+                <span class="fw-semibold">{{ progress.percent }}%</span>
+              </div>
+              <div class="progress" style="height: 0.75rem;">
+                <div class="progress-bar" role="progressbar" data-progress-value="{{ progress.percent }}" aria-valuenow="{{ progress.percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="small text-muted mt-2">{{ receiver_locale.text('home.progress.summary', '{completed} of {total} tasks completed', completed=progress.completed, total=progress.total) if receiver_locale else (progress.completed ~ ' of ' ~ progress.total ~ ' tasks completed') }}</div>
+            </div>
+            {% endif %}
+
+            <div id="receiver-config" data-save-url="{{ url_for('save_receiver_responses', entry_id=entry.id) }}" data-next-url="{{ url_for('receiver_annotation', entry_id=next_entry.id) if next_entry else url_for('participant_home') }}" data-has-responses="{{ 'true' if has_responses else 'false' }}" data-is-complete="{{ 'true' if is_complete else 'false' }}" data-is-locked="{{ 'true' if is_locked else 'false' }}" hidden></div>
+            <div id="status" class="mb-3">{{ initial_status_message }}</div>
+
+            {% if question_items %}
+            <form id="responsesForm" novalidate>
+              {% for item in question_items %}
+              <div class="receiver-question mb-4">
+                <h3 class="h6 fw-semibold mb-2">{{ receiver_locale.text('annotation.prompt.heading', 'Question {number}', number=item.number) if receiver_locale else 'Question ' ~ item.number }}</h3>
+                {% set question_fallback = receiver_locale.text('annotation.prompt.missing', 'No translated question provided.') if receiver_locale else 'No translated question provided.' %}
+                <div class="border border-primary-subtle rounded-3 p-3 mb-3" style="white-space: pre-wrap; line-height: 1.6;">{{ item.translated_question|default(question_fallback, true)|trim|e }}</div>
+                <label class="form-label" for="response-{{ item.id }}">{{ receiver_locale.text('annotation.answer.label', 'Your answer') if receiver_locale else 'Your answer' }}</label>
+                <textarea class="form-control" id="response-{{ item.id }}" name="response-{{ item.id }}" data-question-id="{{ item.id }}" rows="3" placeholder="{{ receiver_locale.text('annotation.answer.placeholder', 'Type your response here') if receiver_locale else 'Type your response here' }}" {% if is_locked %}disabled{% endif %}>{{ item.response|e }}</textarea>
+              </div>
+              {% endfor %}
+            </form>
+            {% else %}
+            <div class="alert alert-warning mb-0" role="alert">{{ receiver_locale.text('annotation.alert.no_questions', 'This conversation does not have any questions to answer yet. Please return to your assignments.') if receiver_locale else 'This conversation does not have any questions to answer yet. Please return to your assignments.' }}</div>
+            {% endif %}
+
+            <div class="d-flex flex-wrap gap-3 mt-4">
+              <button type="button" class="btn btn-success" id="saveButton" {% if is_locked %}disabled{% endif %}>{{ save_button_label }}</button>
+              <button type="button" class="btn btn-outline-secondary" id="nextEntryButton" {% if not has_responses and not is_complete %}disabled{% endif %}>{{ next_button_label }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="application/json" id="receiver-locale-strings">{{ receiver_locale_strings|tojson|safe }}</script>
+{% endblock %}
+{% block body_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const config = document.getElementById('receiver-config');
+    const localeElement = document.getElementById('receiver-locale-strings');
+    let localeStrings = {};
+
+    if (localeElement) {
+      try {
+        localeStrings = JSON.parse(localeElement.textContent || '{}');
+      } catch (error) {
+        console.error('Unable to parse locale strings for receiver annotation', error);
+      }
+    }
+
+    const formatLocaleString = (key, fallback, replacements = {}) => {
+      const template = typeof localeStrings[key] === 'string' ? localeStrings[key] : null;
+      if (!template) {
+        return fallback;
+      }
+      return template.replace(/\{(\w+)\}/g, (match, token) => {
+        if (Object.prototype.hasOwnProperty.call(replacements, token)) {
+          return replacements[token];
+        }
+        return match;
+      });
+    };
+
+    document.querySelectorAll('[data-progress-value]').forEach((bar) => {
+      const value = Number.parseFloat(bar.dataset.progressValue || '');
+      if (!Number.isNaN(value)) {
+        bar.style.width = `${value}%`;
+      }
+    });
+
+    const saveUrl = config ? config.dataset.saveUrl : null;
+    let nextUrl = config ? config.dataset.nextUrl : null;
+    const hasResponses = config ? config.dataset.hasResponses === 'true' : false;
+    const isLocked = config ? config.dataset.isLocked === 'true' : false;
+    let lastSaveSucceeded = config ? config.dataset.isComplete === 'true' : false;
+
+    const statusDiv = document.getElementById('status');
+    const form = document.getElementById('responsesForm');
+    const saveButton = document.getElementById('saveButton');
+    const nextButton = document.getElementById('nextEntryButton');
+    const textareas = form ? form.querySelectorAll('textarea[data-question-id]') : [];
+
+    let isDirty = false;
+
+    const setStatus = (message, cssClass = '') => {
+      if (!statusDiv) {
+        return;
+      }
+      statusDiv.textContent = message;
+      statusDiv.className = cssClass ? `${cssClass} mb-3` : 'mb-3';
+    };
+
+    const updateNextButton = () => {
+      if (nextButton) {
+        nextButton.disabled = !lastSaveSucceeded;
+      }
+    };
+
+    if (!saveUrl || !form || !saveButton || !nextButton) {
+      setStatus(
+        formatLocaleString(
+          'annotation.status.not_ready',
+          'This assignment is not ready for responses. Please contact the study team.',
+        ),
+        'alert alert-danger',
+      );
+      if (saveButton) {
+        saveButton.disabled = true;
+      }
+      if (nextButton) {
+        nextButton.disabled = false;
+        nextButton.addEventListener('click', () => {
+          window.location.href = nextUrl || '{{ url_for("participant_home") }}';
+        });
+      }
+      return;
+    }
+
+    if (isLocked) {
+      setStatus(
+        formatLocaleString(
+          'annotation.status.locked',
+          'This submission has been finalized. Responses are read-only.',
+        ),
+        'alert alert-info',
+      );
+      lastSaveSucceeded = true;
+      textareas.forEach((textarea) => {
+        textarea.setAttribute('disabled', 'disabled');
+      });
+      saveButton.disabled = true;
+    } else {
+      if (hasResponses && lastSaveSucceeded) {
+        setStatus(
+          formatLocaleString(
+            'annotation.status.loaded',
+            'Your previously saved responses are loaded. You can review them below.',
+          ),
+          'alert alert-info',
+        );
+      } else if (hasResponses) {
+        setStatus(
+          formatLocaleString(
+            'annotation.status.draft_loaded',
+            'Draft responses are loaded. Please complete every answer before submitting.',
+          ),
+          'alert alert-warning',
+        );
+      }
+
+      form.addEventListener('input', () => {
+        isDirty = true;
+        lastSaveSucceeded = false;
+        updateNextButton();
+      });
+
+      saveButton.addEventListener('click', async (event) => {
+        event.preventDefault();
+        const responses = {};
+        let hasEmpty = false;
+
+        textareas.forEach((textarea) => {
+          const value = textarea.value || '';
+          responses[textarea.dataset.questionId] = value;
+          if (!value.trim()) {
+            hasEmpty = true;
+          }
+        });
+
+        if (hasEmpty) {
+          const missingAnswers = formatLocaleString(
+            'annotation.status.missing_answers',
+            'Please answer every question before saving.',
+          );
+          alert(missingAnswers);
+          setStatus(missingAnswers, 'alert alert-warning');
+          return;
+        }
+
+        setStatus(
+          formatLocaleString('annotation.status.saving', 'Saving your responses. Please wait...'),
+          'alert alert-info',
+        );
+        saveButton.disabled = true;
+        updateNextButton();
+
+        try {
+          const response = await fetch(saveUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ responses }),
+          });
+
+          const data = await response.json();
+          if (!response.ok || !data.success) {
+            throw new Error(
+              data.error || formatLocaleString('annotation.error.unable_to_save', 'Unable to save responses.'),
+            );
+          }
+
+          lastSaveSucceeded = true;
+          isDirty = false;
+          if (data.next_url) {
+            nextUrl = data.next_url;
+          }
+          updateNextButton();
+          setStatus(
+            formatLocaleString(
+              'annotation.status.save_success',
+              'Responses saved successfully. You can proceed to the next assignment.',
+            ),
+            'alert alert-success',
+          );
+        } catch (error) {
+          console.error('Error saving responses:', error);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          setStatus(
+            formatLocaleString('annotation.status.error', `Error: ${errorMessage}`, { message: errorMessage }),
+            'alert alert-danger',
+          );
+        } finally {
+          saveButton.disabled = false;
+        }
+      });
+
+      window.addEventListener('beforeunload', (event) => {
+        if (!isDirty) {
+          return;
+        }
+        event.preventDefault();
+        event.returnValue = '';
+      });
+    }
+
+    updateNextButton();
+
+    if (nextButton) {
+      nextButton.addEventListener('click', () => {
+        if (nextButton.disabled) {
+          return;
+        }
+        window.location.href = nextUrl || '{{ url_for("participant_home") }}';
+      });
+    }
+  });
+</script>
+{% endblock %}

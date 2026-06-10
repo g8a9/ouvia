@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}UI Previews · Study Portal{% endblock %}
+{% block content %}
+<div class="row justify-content-center mb-4">
+  <div class="col-xl-9">
+    <a class="btn btn-link px-0" href="{{ url_for('dashboard') }}">&larr; Back to dashboard</a>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-xl-9">
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4">
+          <div>
+            <h1 class="h3 fw-semibold mb-1">Annotation UI Previews</h1>
+            <p class="text-muted mb-0">Preview how different participant roles see their annotation interfaces.</p>
+          </div>
+          <span class="badge rounded-pill bg-info-subtle text-info">Admin only</span>
+        </div>
+        <div class="alert alert-info" role="alert">
+          <strong>Note:</strong> These previews use mock data and are for demonstration purposes only. Form submissions and recordings are disabled.
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for preview in previews %}
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-semibold mb-2">{{ preview.name }}</h2>
+            <p class="text-muted small mb-3">{{ preview.description }}</p>
+            <a href="{{ preview.url }}" class="btn btn-outline-primary">View preview</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Study Terms · Study Portal{% endblock %}
+{% block head_styles %}
+{{ super() }}
+<style>
+  [data-lang-content] {
+    display: none;
+  }
+  [data-lang-content].active {
+    display: block;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-lg-5">
+
+        {% include "partials/terms_content.html" %}
+
+        <form method="post" class="d-flex flex-column flex-md-row gap-3">
+          <button type="submit" class="btn btn-primary btn-lg flex-fill">I Accept the Terms</button>
+          <a class="btn btn-outline-secondary btn-lg flex-fill" href="{{ url_for('logout') }}">Log out</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleContainer = document.getElementById('lang-toggle');
+  if (!toggleContainer) return;
+
+  const buttons = toggleContainer.querySelectorAll('button[data-lang]');
+  const contentBlocks = document.querySelectorAll('[data-lang-content]');
+
+  toggleContainer.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-lang]');
+    if (!button) return;
+
+    const lang = button.dataset.lang;
+
+    buttons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+
+    contentBlocks.forEach(block => {
+      block.classList.toggle('active', block.dataset.langContent === lang);
+    });
+  });
+});
+</script>
+{% endblock %}

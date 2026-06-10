@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}{{ locale.text('signup.page_title', 'Sign Up · Study Portal') }}{% endblock %}
+{% block head_styles %}
+{{ super() }}
+<style>
+  [data-lang-content] {
+    display: none;
+  }
+  [data-lang-content].active {
+    display: block;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4 p-lg-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-3">
+          <div>
+            <p class="text-uppercase small text-muted mb-1">{{ locale.text('signup.label', 'Sign up') }}</p>
+            <h1 class="h4 fw-semibold mb-2">{% if role == 'final_sender' %}{{ locale.text('signup.heading_final_sender', 'Join as a survey respondent') }}{% else %}{{ locale.text('signup.heading', 'Join as {role}', role=role|capitalize) }}{% endif %}</h1>
+            <p class="text-muted mb-0">{{ locale.text('signup.subheading', 'Review the terms, share your Prolific ID, and confirm to start your assignments.') }}</p>
+          </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" class="d-flex flex-column gap-4">
+          <input type="hidden" name="role" value="{{ role }}">
+          <input type="hidden" name="authkey" value="{{ authkey }}">
+
+          <div>
+            <div class="text-danger small mb-2">{{ locale.text('signup.prolific_id_warning', "Be sure to enter your correct ID -- we won't be able to monitor your progress or issue retribution otherwise.") }}</div>
+            <label for="prolific_id" class="form-label">{{ locale.text('signup.prolific_id_label', 'Prolific ID') }}</label>
+            <input type="text" class="form-control" id="prolific_id" name="prolific_id" value="{{ prolific_id }}" required>
+          </div>
+
+          {% if role == 'sender' or role == 'final_sender' %}
+          <div class="mb-3">
+            <label for="gender" class="form-label">{{ locale.text('signup.gender_label', 'What gender are you currently?') }}</label>
+            <select class="form-select" id="gender" name="gender" required>
+              <option value="" disabled {% if not gender %}selected{% endif %}>{{ locale.text('signup.select_option', 'Select an option') }}</option>
+              {% for option in gender_options %}
+              <option value="{{ option.value }}" {% if gender == option.value %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="trans" class="form-label">{{ locale.text('signup.trans_label', 'Does your current gender differ from the one you were assigned at birth?') }}</label>
+            <select class="form-select" id="trans" name="trans" required>
+              <option value="" disabled {% if not trans %}selected{% endif %}>{{ locale.text('signup.select_option', 'Select an option') }}</option>
+              {% for option in trans_options %}
+              <option value="{{ option.value }}" {% if trans == option.value %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <a href="#" id="demographicsWhyLink" class="small text-primary">{{ locale.text('signup.demographics_why_link', 'Why are we asking you this?') }}</a>
+            <div id="demographicsWhyCallout" class="alert alert-info mt-2 small" style="display: none;">
+              {{ locale.text('signup.demographics_why_text', 'Knowing this information helps us better tailor our analysis and ensure we respect the experiences of different groups. Your response will be stored securely and used only for aggregated demographic analysis. You do not have to answer these questions if you prefer not to; choosing "Rather not say" is fine.') }}
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="border rounded-4 p-3 p-md-4 bg-light">
+            {% include "partials/terms_content.html" %}
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="accept_terms" name="accept_terms" required {% if request.method == 'POST' and accepted_terms %}checked{% endif %}>
+            <label class="form-check-label" for="accept_terms">{{ locale.text('signup.accept_terms_label', 'I have read and accept the Terms & Conditions.') }}</label>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">{{ locale.text('signup.submit_button', 'Create account') }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block body_scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleContainer = document.getElementById('lang-toggle');
+  if (toggleContainer) {
+    const buttons = toggleContainer.querySelectorAll('button[data-lang]');
+    const contentBlocks = document.querySelectorAll('[data-lang-content]');
+
+    toggleContainer.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-lang]');
+      if (!button) return;
+
+      const lang = button.dataset.lang;
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      contentBlocks.forEach(block => {
+        block.classList.toggle('active', block.dataset.langContent === lang);
+      });
+    });
+  }
+
+  const whyLink = document.getElementById('demographicsWhyLink');
+  const whyCallout = document.getElementById('demographicsWhyCallout');
+  if (whyLink && whyCallout) {
+    whyLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      const isVisible = whyCallout.style.display === 'block';
+      whyCallout.style.display = isVisible ? 'none' : 'block';
+    });
+  }
+});
+</script>
+{% endblock %}

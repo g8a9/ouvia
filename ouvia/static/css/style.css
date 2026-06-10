@@ -1,0 +1,31 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main.container {
+  flex: 1 0 auto;
+}
+
+.site-footer {
+  flex-shrink: 0;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1.5rem 3rem rgba(37, 99, 235, 0.12);
+}
+
+.terms-scroll {
+  max-height: 18rem;
+  overflow-y: auto;
+}
