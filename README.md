@@ -7,7 +7,7 @@
 - **`ouvia/`** – Flask web application that powers the study portal. Handles user authentication, role-based dashboards, conversation entry management, assignment workflows, and the recording/annotation pipeline.
 - **`study/`** – Analysis and result-generation code for the paper. Contains data preparation scripts, statistical analyses, quality checks, and automatic translation quality evaluation.
 
-> [!INFO]
+> [!NOTE]
 > We will soon release a basic documentation in the GitHub wiki as a tutorial walkthrough for running a new study.
 
 > [!IMPORTANT]
